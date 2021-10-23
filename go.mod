@@ -1,4 +1,4 @@
-module gitlab.com/nexlabhq/notification
+module github.com/nexlabhq/notification
 
 go 1.16
 
