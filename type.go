@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+const (
+	AllClients = "all"
+)
+
 type notification_bool_exp map[string]interface{}
 type notification_set_input map[string]interface{}
 type notification_template_bool_exp map[string]interface{}
@@ -30,6 +34,7 @@ type notificationUsersInput struct {
 type NotificationInput struct {
 	AppID       string                `json:"api_id,omitempty"`
 	ClientName  string                `json:"client_name,omitempty"`
+	ClientNames []string              `json:"-"`
 	TemplateID  string                `json:"template_id,omitempty"`
 	Broadcast   bool                  `json:"broadcast"`
 	Headings    map[string]string     `json:"headings,omitempty"`

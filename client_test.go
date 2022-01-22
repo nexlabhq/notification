@@ -4,13 +4,23 @@
 package notification
 
 import (
+	"context"
 	"net/http"
+	"os"
 	"testing"
 	"time"
 
 	"github.com/hasura/go-graphql-client"
 	"github.com/stretchr/testify/assert"
 )
+
+func cleanup(t *testing.T, client *Client) {
+	_, err := client.DeleteNotifications(map[string]interface{}{})
+	assert.Nil(t, err)
+
+	_, err = client.DeleteNotifications(map[string]interface{}{})
+	assert.Nil(t, err)
+}
 
 // hasuraTransport transport for Hasura GraphQL Client
 type hasuraTransport struct {
@@ -32,18 +42,21 @@ func (t *hasuraTransport) RoundTrip(r *http.Request) (*http.Response, error) {
 }
 
 func newGqlClient() *graphql.Client {
+	adminSecret := os.Getenv("HASURA_GRAPHQL_ADMIN_SECRET")
 	httpClient := &http.Client{
 		Transport: &hasuraTransport{
 			rt:          http.DefaultTransport,
-			adminSecret: "hasura",
+			adminSecret: adminSecret,
 		},
 		Timeout: 30 * time.Second,
 	}
-	return graphql.NewClient("http://localhost:8080/v1/graphql", httpClient)
+	return graphql.NewClient(os.Getenv("DATA_URL"), httpClient)
 }
 
 func TestGetNotificationTemplates(t *testing.T) {
+
 	client := New(newGqlClient())
+	defer cleanup(t, client)
 
 	templates, err := client.UpsertTemplates([]*NotificationTemplate{
 		{
@@ -73,10 +86,13 @@ func TestGetNotificationTemplates(t *testing.T) {
 func TestSendNotifications(t *testing.T) {
 
 	client := New(newGqlClient())
+	defer cleanup(t, client)
+
 	headings := "Test headings"
 	contents := "Test contents"
 	results, err := client.Send([]*NotificationInput{
 		{
+			ClientNames: []string{"app1", "app2"},
 			Headings: map[string]string{
 				"en": headings,
 				"vi": headings,
@@ -93,10 +109,30 @@ func TestSendNotifications(t *testing.T) {
 	})
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(results))
+
+	var getQuery struct {
+		Notifications []struct {
+			ClientName string `graphql:"client_name"`
+		} `graphql:"notification(where: $where)"`
+	}
+
+	getVariables := map[string]interface{}{
+		"where": notification_bool_exp{
+			"id": map[string]interface{}{
+				"_eq": results[0],
+			},
+		},
+	}
+	err = client.client.Query(context.TODO(), &getQuery, getVariables)
+	assert.NoError(t, err)
+	assert.Equal(t, 1, len(getQuery.Notifications))
+	assert.Equal(t, "app1,app2", getQuery.Notifications[0].ClientName)
 }
 
 func TestCancelNotifications(t *testing.T) {
 	client := New(newGqlClient())
+	defer cleanup(t, client)
+
 	headings := "Test headings"
 	contents := "Test contents"
 	results, err := client.Send([]*NotificationInput{
