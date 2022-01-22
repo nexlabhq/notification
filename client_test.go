@@ -92,7 +92,7 @@ func TestSendNotifications(t *testing.T) {
 	contents := "Test contents"
 	results, err := client.Send([]*NotificationInput{
 		{
-			ClientNames: []string{"app1", "app2"},
+			ClientName: ToClientName("app1", "app2"),
 			Headings: map[string]string{
 				"en": headings,
 				"vi": headings,

@@ -34,7 +34,6 @@ type notificationUsersInput struct {
 type NotificationInput struct {
 	AppID       string                `json:"api_id,omitempty"`
 	ClientName  string                `json:"client_name,omitempty"`
-	ClientNames []string              `json:"-"`
 	TemplateID  string                `json:"template_id,omitempty"`
 	Broadcast   bool                  `json:"broadcast"`
 	Headings    map[string]string     `json:"headings,omitempty"`

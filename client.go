@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"strings"
 	"time"
 
 	"github.com/hasura/go-graphql-client"
@@ -39,9 +38,7 @@ func (c *Client) Send(inputs []*NotificationInput) ([]string, error) {
 		if len(n.Headings) == 0 && len(n.Contents) == 0 {
 			continue
 		}
-		if len(n.ClientNames) > 0 {
-			n.ClientName = strings.Join(n.ClientNames, ",")
-		}
+
 		item := notification_insert_input{
 			NotificationInput: n,
 		}
