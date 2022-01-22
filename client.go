@@ -38,6 +38,7 @@ func (c *Client) Send(inputs []*NotificationInput) ([]string, error) {
 		if len(n.Headings) == 0 && len(n.Contents) == 0 {
 			continue
 		}
+
 		item := notification_insert_input{
 			NotificationInput: n,
 		}
@@ -148,6 +149,7 @@ func (c *Client) GetTemplateByIDs(ids ...string) (map[string]*NotificationTempla
 	return results, nil
 }
 
+// UpsertTemplates insert or update notification templates
 func (c *Client) UpsertTemplates(inputs []*NotificationTemplate) ([]*NotificationTemplate, error) {
 	if len(inputs) == 0 {
 		return []*NotificationTemplate{}, nil
@@ -190,6 +192,7 @@ func (c *Client) UpsertTemplates(inputs []*NotificationTemplate) ([]*Notificatio
 	return results, nil
 }
 
+// CancelNotificationsBySubject cancel and update notifications by subject
 func (c *Client) CancelNotificationsBySubject(subjectType string, subjectId string) (int, error) {
 	variables := map[string]interface{}{
 		"subject_id": map[string]string{
@@ -208,6 +211,7 @@ func (c *Client) CancelNotificationsBySubject(subjectType string, subjectId stri
 	return c.CancelNotifications(variables)
 }
 
+// CancelNotifications cancel and update notifications
 func (c *Client) CancelNotifications(where map[string]interface{}) (int, error) {
 
 	var mutation struct {
@@ -224,10 +228,41 @@ func (c *Client) CancelNotifications(where map[string]interface{}) (int, error) 
 		},
 	}
 
-	err := c.client.Mutate(context.Background(), &mutation, variables, graphql.OperationName("UpsertNotificationTemplates"))
+	err := c.client.Mutate(context.Background(), &mutation, variables, graphql.OperationName("CancelNotifications"))
 	if err != nil {
 		return 0, err
 	}
 
 	return mutation.UpdateNotifications.AffectedRows, nil
+}
+
+// DeleteNotifications execute delete notifications mutation
+func (c *Client) DeleteNotifications(where map[string]interface{}) (int, error) {
+	var mutation struct {
+		DeleteNotifications struct {
+			AffectedRows int `graphql:"affected_rows"`
+		} `graphql:"delete_notification(where: $where)"`
+	}
+
+	variables := map[string]interface{}{
+		"where": notification_bool_exp(where),
+	}
+
+	err := c.client.Mutate(context.Background(), &mutation, variables, graphql.OperationName("DeleteNotifications"))
+	if err != nil {
+		return 0, err
+	}
+
+	return mutation.DeleteNotifications.AffectedRows, nil
+}
+
+// DeleteTemplates delete notification templates
+func (c *Client) DeleteTemplates(where map[string]interface{}) (int, error) {
+	var mutation struct {
+		DeleteNotificationTemplates struct {
+			AffectedRows int `graphql:"affected_rows"`
+		} `graphql:"delete_notification_template(where: $where)"`
+	}
+
+	return mutation.DeleteNotificationTemplates.AffectedRows, nil
 }

@@ -7,6 +7,10 @@ import (
 	"time"
 )
 
+const (
+	AllClients = "all"
+)
+
 type notification_bool_exp map[string]interface{}
 type notification_set_input map[string]interface{}
 type notification_template_bool_exp map[string]interface{}

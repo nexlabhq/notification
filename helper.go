@@ -3,8 +3,18 @@ package notification
 import (
 	"bytes"
 	"fmt"
+	"strings"
 	"text/template"
 )
+
+// ToClientName convert multiple client names to string
+func ToClientName(name string, names ...string) string {
+	if len(names) == 0 {
+		return name
+	}
+
+	return strings.Join(append([]string{name}, names...), ",")
+}
 
 func ParseTemplate(nt *NotificationTemplate, variables interface{}) (*NotificationTemplate, error) {
 	headings := make(map[string]string)
