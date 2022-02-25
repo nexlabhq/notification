@@ -1,6 +1,3 @@
-//go:build integration
-// +build integration
-
 package notification
 
 import (
@@ -14,12 +11,20 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func cleanup(t *testing.T, client *Client) {
-	_, err := client.DeleteNotifications(map[string]interface{}{})
-	assert.Nil(t, err)
+func cleanup(t *testing.T, client *graphql.Client) {
 
-	_, err = client.DeleteNotifications(map[string]interface{}{})
-	assert.Nil(t, err)
+	var mutation struct {
+		DeleteNotifications struct {
+			AffectedRows int `graphql:"affected_rows"`
+		} `graphql:"delete_notification(where: $where)"`
+	}
+
+	variables := map[string]interface{}{
+		"where": notification_bool_exp{},
+	}
+
+	err := client.Mutate(context.Background(), &mutation, variables, graphql.OperationName("DeleteNotifications"))
+	assert.NoError(t, err)
 }
 
 // hasuraTransport transport for Hasura GraphQL Client
@@ -53,46 +58,16 @@ func newGqlClient() *graphql.Client {
 	return graphql.NewClient(os.Getenv("DATA_URL"), httpClient)
 }
 
-func TestGetNotificationTemplates(t *testing.T) {
-
-	client := New(newGqlClient())
-	defer cleanup(t, client)
-
-	templates, err := client.UpsertTemplates([]*NotificationTemplate{
-		{
-			ID: "test_template",
-			Headings: map[string]string{
-				"en": "Test headings en",
-				"vi": "Test headings vi",
-			},
-			Contents: map[string]string{
-				"en": "Test contents en",
-				"vi": "Test contents vi",
-			},
-		},
-	})
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(templates))
-
-	returnedTemplates, err := client.GetTemplateByIDs("test_template")
-	assert.NoError(t, err)
-	assert.Equal(t, 1, len(templates))
-
-	assert.Equal(t, templates[0].ID, returnedTemplates["test_template"].ID)
-	assert.Equal(t, templates[0].Headings, returnedTemplates["test_template"].Headings)
-	assert.Equal(t, templates[0].Contents, returnedTemplates["test_template"].Contents)
-}
-
 func TestSendNotifications(t *testing.T) {
 
 	client := New(newGqlClient())
-	defer cleanup(t, client)
+	defer cleanup(t, client.client)
 
 	headings := "Test headings"
 	contents := "Test contents"
-	results, err := client.Send([]*NotificationInput{
+	results, err := client.Send([]*SendNotificationInput{
 		{
-			ClientName: ToClientName("app1", "app2"),
+			ClientName: ToClientName("default", "test2"),
 			Headings: map[string]string{
 				"en": headings,
 				"vi": headings,
@@ -105,10 +80,10 @@ func TestSendNotifications(t *testing.T) {
 			Metadata: &NotificationMetadata{
 				ImageURL: "https://en.wikipedia.org/static/images/project-logos/enwiki.png",
 			},
+			Save: true,
 		},
-	})
+	}, nil)
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(results))
 
 	var getQuery struct {
 		Notifications []struct {
@@ -119,23 +94,23 @@ func TestSendNotifications(t *testing.T) {
 	getVariables := map[string]interface{}{
 		"where": notification_bool_exp{
 			"id": map[string]interface{}{
-				"_eq": results[0],
+				"_eq": results.Responses[0].RequestID,
 			},
 		},
 	}
 	err = client.client.Query(context.TODO(), &getQuery, getVariables)
 	assert.NoError(t, err)
 	assert.Equal(t, 1, len(getQuery.Notifications))
-	assert.Equal(t, "app1,app2", getQuery.Notifications[0].ClientName)
+	assert.Equal(t, "default,test2", getQuery.Notifications[0].ClientName)
 }
 
 func TestCancelNotifications(t *testing.T) {
 	client := New(newGqlClient())
-	defer cleanup(t, client)
+	defer cleanup(t, client.client)
 
 	headings := "Test headings"
 	contents := "Test contents"
-	results, err := client.Send([]*NotificationInput{
+	results, err := client.Send([]*SendNotificationInput{
 		{
 			Headings: map[string]string{
 				"en": headings,
@@ -153,9 +128,9 @@ func TestCancelNotifications(t *testing.T) {
 				ImageURL: "https://en.wikipedia.org/static/images/project-logos/enwiki.png",
 			},
 		},
-	})
+	}, nil)
 	assert.NoError(t, err)
-	assert.Equal(t, 1, len(results))
+	assert.True(t, results.SuccessCount > 0)
 
 	canceledCount, err := client.CancelNotificationsBySubject("test", "test_id")
 	assert.NoError(t, err)
