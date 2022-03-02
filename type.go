@@ -8,7 +8,7 @@ const (
 	AllClients = "all"
 )
 
-type json map[string]interface{}
+type json map[string]string
 type notification_bool_exp map[string]interface{}
 type notification_set_input map[string]interface{}
 
@@ -32,8 +32,6 @@ type NotificationButton struct {
 }
 
 type NotificationMetadata struct {
-	CaseID    string            `json:"case_id"`
-	SessionID string            `json:"session_id"`
 	Color     string            `json:"color"`
 	URL       string            `json:"url"`
 	ImageURL  string            `json:"image_url"`

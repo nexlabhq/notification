@@ -18,7 +18,7 @@ func New(client *graphql.Client) *Client {
 	}
 }
 
-func (c *Client) Send(inputs []*SendNotificationInput, variables map[string]interface{}) (*SendNotificationOutput, error) {
+func (c *Client) Send(inputs []*SendNotificationInput, variables map[string]string) (*SendNotificationOutput, error) {
 	if len(inputs) == 0 {
 		return &SendNotificationOutput{}, nil
 	}
