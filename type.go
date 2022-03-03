@@ -101,6 +101,20 @@ type NotificationMetadata struct {
 	DelayedOption string `json:"delayed_option,omitempty"`
 	// Use with delayed_option=timezone.
 	DeliveryTimeOfDay string `json:"delivery_time_of_day,omitempty"`
+	// Use to target a specific experience in your App Clip, or to target your notification to a specific window in a multi-scene App.
+	// https://documentation.onesignal.com/docs/app-clip-support
+	TargetContentIdentifier string `json:"target_content_identifier,omitempty"`
+	// Use "data" or "message" depending on the type of notification you are sending
+	// https://documentation.onesignal.com/docs/data-notifications
+	HuaweiMsgType string `json:"huawei_msg_type,omitempty"`
+	// The Android Oreo Notification Category to send the notification under.
+	AndroidChannelID string `json:"android_channel_id,omitempty"`
+	// Use this if you have client side Android Oreo Channels you have already defined in your app with code.
+	ExistingAndroidChannelID string `json:"existing_android_channel_id,omitempty"`
+	// The Android Oreo Notification Category to send the notification under
+	HuaweiChannelID string `json:"huawei_channel_id,omitempty"`
+	// Use this if you have client side Android Oreo Channels you have already defined in your app with code.
+	HuaweiExistingChannelID string `json:"huawei_existing_channel_id,omitempty"`
 }
 
 type SendNotificationInput struct {
