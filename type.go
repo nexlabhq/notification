@@ -32,35 +32,35 @@ type NotificationButton struct {
 }
 
 type NotificationMetadata struct {
-	Color     string            `json:"color"`
-	URL       string            `json:"url"`
-	ImageURL  string            `json:"image_url"`
-	Subtitles map[string]string `json:"subtitles"`
+	URL       string            `json:"url,omitempty"`
+	ImageURL  string            `json:"image_url,omitempty"`
+	Subtitles map[string]string `json:"subtitles,omitempty"`
 
 	SmallIcon    string            `json:"small_icon,omitempty"`
 	LargeIcon    string            `json:"large_icon,omitempty"`
 	GroupID      string            `json:"group_id,omitempty"`
 	GroupMessage map[string]string `json:"group_message,omitempty"`
-	// iOS 15+ Relevance Score is a score to be set per notification to indicate how it should be displayed when grouped.
-	// https://documentation.onesignal.com/docs/ios-relevance-score
-	IOSRelevanceScore float32 `json:"ios_relevance_score,omitempty"`
-	// iOS 15+ Focus Modes and Interruption Levels indicate the priority and delivery timing of a notification, to ‘interrupt’ the user.
-	IOSInterruptionLevel string `json:"ios_interruption_level,omitempty"`
 	// Describes whether to set or increase/decrease your app's iOS badge count by the ios_badgeCount specified count.
 	// Can specify None, SetTo, or Increase.
 	IOSBadgeType string `json:"ios_badge_type,omitempty"`
 	// Used with ios_badgeType, describes the value to set or amount to increase/decrease your app's iOS badge count by.
 	// You can use a negative number to decrease the badge count when used with an ios_badgeType of Increase.
-	IOSBadgeCount int `json:"ios_badge_count,omitempty"`
+	IOSBadgeCount *int32 `json:"ios_badge_count,omitempty"`
 	// iOS: Category APS payload, use with registerUserNotificationSettings:categories in your Objective-C / Swift code.
 	// Example: calendar category which contains actions like accept and decline
 	// iOS 10+ This will trigger your UNNotificationContentExtension whose ID matches this category.
 	IOSCategory string `json:"ios_category,omitempty"`
+	// iOS 15+ Relevance Score is a score to be set per notification to indicate how it should be displayed when grouped.
+	// https://documentation.onesignal.com/docs/ios-relevance-score
+	IOSRelevanceScore *float32 `json:"ios_relevance_score,omitempty"`
+	// iOS 15+ Focus Modes and Interruption Levels indicate the priority and delivery timing of a notification, to ‘interrupt’ the user.
+	IOSInterruptionLevel string `json:"ios_interruption_level,omitempty"`
 	// In iOS you can specify the type of icon to be used in an Action button as being either ['system', 'custom']
 	IconType string `json:"icon_type,omitempty"`
-	// Sets the background color of the notification circle to the left of the notification text.
-	// Only applies to apps targeting Android API level 21+ on Android 5.0+ devices.
-	AccentColor string `json:"accent_color"`
+	// Channel: Push Notifications Platform: Android Sets the background color of the notification circle to the left of the notification text. Only applies to apps targeting Android API level 21+ on Android 5.0+ devices. Example(Red): \"FFFF0000\"
+	AndroidAccentColor string `json:"android_accent_color,omitempty"`
+	// Channel: Push Notifications Platform: Huawei Accent Color used on Action Buttons and Group overflow count. Uses RGB Hex value (E.g. #9900FF). Defaults to device's theme color if not set.
+	HuaweiAccentColor string `json:"huawei_accent_color,omitempty"`
 	// Android Allowing setting a background image for the notification. This is a JSON object containing the following keys.
 	// https://documentation.onesignal.com/docs/android-customizations#section-background-images
 	AndroidBackgroundLayout *AndroidBackgroundLayout `json:"android_background_layout,omitempty"`
@@ -73,11 +73,11 @@ type NotificationMetadata struct {
 	// Pass 10 for high priority or any other integer for normal priority.
 	// Defaults to normal priority for Android and high for iOS.
 	// For Android 6.0+ devices setting priority to high will wake the device out of doze mode.
-	Priority uint `json:"priority,omitempty"`
+	Priority *int32 `json:"priority,omitempty"`
 	// Time To Live - In seconds. The notification will be expired if the device does not come back online within this time.
 	// The default is 259,200 seconds (3 days).
 	// Max value to set is 2419200 seconds (28 days).
-	TTL uint `json:"ttl,omitempty"`
+	TTL int32 `json:"ttl,omitempty"`
 	// Apps with throttling enabled
 	// - does not work with timezone or intelligent delivery, throttling limits will take precedence. Set to 0 if you want to use timezone or intelligent delivery.
 	// - the parameter value will be used to override the default application throttling value set from the dashboard settings.
@@ -86,11 +86,7 @@ type NotificationMetadata struct {
 	// Apps with throttling disabled
 	// - this parameter can be used to throttle delivery for the notification even though throttling is not enabled at the application level.
 	// https://documentation.onesignal.com/docs/throttling
-	ThrottleRatePerMinute uint `json:"throttle_rate_per_minute,omitempty"`
-	// When frequency capping is enabled for the app, sending true will apply the frequency capping to the notification.
-	// If the parameter is not included, the default behavior is to apply frequency capping if the setting is enabled for the app.
-	// Setting the parameter to false will override the frequency capping, meaning that the notification will be sent without considering frequency capping.
-	EnableFrequencyCap bool `json:"enable_frequency_cap,omitempty"`
+	ThrottleRatePerMinute int32 `json:"throttle_rate_per_minute,omitempty"`
 	// iOS Set the value to voip for sending VoIP Notifications
 	// This field maps to the APNS header apns-push-type.
 	// Note: alert and background are automatically set by OneSignal
@@ -107,6 +103,7 @@ type NotificationMetadata struct {
 	// Use "data" or "message" depending on the type of notification you are sending
 	// https://documentation.onesignal.com/docs/data-notifications
 	HuaweiMsgType string `json:"huawei_msg_type,omitempty"`
+
 	// The Android Oreo Notification Category to send the notification under.
 	AndroidChannelID string `json:"android_channel_id,omitempty"`
 	// Use this if you have client side Android Oreo Channels you have already defined in your app with code.
@@ -115,6 +112,14 @@ type NotificationMetadata struct {
 	HuaweiChannelID string `json:"huawei_channel_id,omitempty"`
 	// Use this if you have client side Android Oreo Channels you have already defined in your app with code.
 	HuaweiExistingChannelID string `json:"huawei_existing_channel_id,omitempty"`
+	// Channel: Push Notifications Platform: iOS Sound file that is included in your app to play instead of the default device notification sound. Pass nil to disable vibration and sound for the notification. Example: \"notification.wav\"
+	IOSSound string `json:"ios_sound,omitempty"`
+	// Channel: Push Notifications Platform: Windows Sound file that is included in your app to play instead of the default device notification sound. Example: \"notification.wav\"
+	WpWnsSound string `json:"wp_wns_sound,omitempty"`
+	// Channel: Push Notifications Platform: iOS 10+ iOS can localize push notification messages on the client using special parameters such as loc-key. When using the Create Notification endpoint, you must include these parameters inside of a field called apns_alert. Please see Apple's guide on localizing push notifications to learn more.
+	ApnsAlert map[string]interface{} `json:"apns_alert,omitempty"`
+	// Channel: Push Notifications Platform: iOS 12+ When using thread_id, you can also control the count of the number of notifications in the group. For example, if the group already has 12 notifications, and you send a new notification with summary_arg_count = 2, the new total will be 14 and the summary will be \"14 more notifications from summary_arg\"
+	SummaryArgCount *int32 `json:"summary_arg_count,omitempty"`
 }
 
 type SendNotificationInput struct {

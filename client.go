@@ -8,16 +8,19 @@ import (
 	"github.com/hasura/go-graphql-client"
 )
 
+// Client represents a generic notification client
 type Client struct {
 	client *graphql.Client
 }
 
+// New creates a Client instance
 func New(client *graphql.Client) *Client {
 	return &Client{
 		client: client,
 	}
 }
 
+// Send sends create notifications request
 func (c *Client) Send(inputs []*SendNotificationInput, variables map[string]string) (*SendNotificationOutput, error) {
 	if len(inputs) == 0 {
 		return &SendNotificationOutput{}, nil
