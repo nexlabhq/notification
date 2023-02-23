@@ -120,24 +120,27 @@ type NotificationMetadata struct {
 	ApnsAlert map[string]interface{} `json:"apns_alert,omitempty"`
 	// Channel: Push Notifications Platform: iOS 12+ When using thread_id, you can also control the count of the number of notifications in the group. For example, if the group already has 12 notifications, and you send a new notification with summary_arg_count = 2, the new total will be 14 and the summary will be \"14 more notifications from summary_arg\"
 	SummaryArgCount *int32 `json:"summary_arg_count,omitempty"`
+	// Optional custom data from the template
+	Data map[string]string `json:"data,omitempty"`
 }
 
 type SendNotificationInput struct {
-	AppID       string                `json:"api_id,omitempty"`
-	ClientName  string                `json:"client_name,omitempty"`
-	TemplateID  string                `json:"template_id,omitempty"`
-	Broadcast   bool                  `json:"broadcast"`
-	Headings    map[string]string     `json:"headings,omitempty"`
-	Contents    map[string]string     `json:"contents,omitempty"`
-	SubjectType string                `json:"subject_type,omitempty"`
-	SubjectID   string                `json:"subject_id,omitempty"`
-	Topics      []string              `json:"topics,omitempty"`
-	UserIDs     []string              `json:"user_ids,omitempty"`
-	SendAfter   time.Time             `json:"send_after,omitempty"`
-	Data        map[string]string     `json:"data,omitempty"`
-	Metadata    *NotificationMetadata `json:"metadata,omitempty"`
-	Visible     bool                  `json:"visible,omitempty"`
-	Save        bool                  `json:"save,omitempty"`
+	AppID        string                `json:"api_id,omitempty"`
+	ClientName   string                `json:"client_name,omitempty"`
+	TemplateID   string                `json:"template_id,omitempty"`
+	Broadcast    bool                  `json:"broadcast"`
+	Headings     map[string]string     `json:"headings,omitempty"`
+	Contents     map[string]string     `json:"contents,omitempty"`
+	ContentsHTML map[string]string     `json:"contents_html,omitempty"`
+	SubjectType  string                `json:"subject_type,omitempty"`
+	SubjectID    string                `json:"subject_id,omitempty"`
+	Topics       []string              `json:"topics,omitempty"`
+	UserIDs      []string              `json:"user_ids,omitempty"`
+	SendAfter    time.Time             `json:"send_after,omitempty"`
+	Data         map[string]string     `json:"data,omitempty"`
+	Metadata     *NotificationMetadata `json:"metadata,omitempty"`
+	Visible      bool                  `json:"visible,omitempty"`
+	Save         bool                  `json:"save,omitempty"`
 }
 
 type SendResponse struct {
