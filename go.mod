@@ -1,6 +1,6 @@
 module github.com/nexlabhq/notification
 
-go 1.18
+go 1.20
 
 require (
 	github.com/hasura/go-graphql-client v0.10.2
