@@ -6,15 +6,16 @@ import (
 	"time"
 
 	"github.com/hasura/go-graphql-client"
+	"github.com/hgiasac/graphql-utils/client"
 )
 
 // Client represents a generic notification client
 type Client struct {
-	client *graphql.Client
+	client client.Client
 }
 
 // New creates a Client instance
-func New(client *graphql.Client) *Client {
+func New(client client.Client) *Client {
 	return &Client{
 		client: client,
 	}
