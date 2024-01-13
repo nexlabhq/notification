@@ -11,10 +11,11 @@ import (
 	"time"
 
 	"github.com/hasura/go-graphql-client"
+	"github.com/hgiasac/graphql-utils/client"
 	"github.com/stretchr/testify/assert"
 )
 
-func cleanup(t *testing.T, client *graphql.Client) {
+func cleanup(t *testing.T, client client.Client) {
 
 	var mutation struct {
 		DeleteNotifications struct {
