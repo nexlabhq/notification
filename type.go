@@ -9,8 +9,8 @@ const (
 )
 
 type json map[string]string
-type notification_bool_exp map[string]interface{}
-type notification_set_input map[string]interface{}
+type notification_bool_exp map[string]any
+type notification_set_input map[string]any
 
 // AndroidBackgroundLayout allows setting a background image for the notification. This is a JSON object containing the following keys.
 // https://documentation.onesignal.com/docs/android-customizations#section-background-images
@@ -117,7 +117,7 @@ type NotificationMetadata struct {
 	// Channel: Push Notifications Platform: Windows Sound file that is included in your app to play instead of the default device notification sound. Example: \"notification.wav\"
 	WpWnsSound string `json:"wp_wns_sound,omitempty"`
 	// Channel: Push Notifications Platform: iOS 10+ iOS can localize push notification messages on the client using special parameters such as loc-key. When using the Create Notification endpoint, you must include these parameters inside of a field called apns_alert. Please see Apple's guide on localizing push notifications to learn more.
-	ApnsAlert map[string]interface{} `json:"apns_alert,omitempty"`
+	ApnsAlert map[string]any `json:"apns_alert,omitempty"`
 	// Channel: Push Notifications Platform: iOS 12+ When using thread_id, you can also control the count of the number of notifications in the group. For example, if the group already has 12 notifications, and you send a new notification with summary_arg_count = 2, the new total will be 14 and the summary will be \"14 more notifications from summary_arg\"
 	SummaryArgCount *int32 `json:"summary_arg_count,omitempty"`
 	// Optional custom data from the template
@@ -147,12 +147,12 @@ type SendNotificationInput struct {
 }
 
 type SendResponse struct {
-	Success           bool        `json:"success" graphql:"success"`
-	RateLimitExceeded bool        `json:"rate_limit_exceeded" graphql:"rate_limit_exceeded"`
-	ClientName        string      `json:"client_name,omitempty" graphql:"client_name"`
-	RequestID         string      `json:"request_id,omitempty" graphql:"request_id"`
-	MessageID         string      `json:"message_id,omitempty" graphql:"message_id"`
-	Error             interface{} `json:"error,omitempty" graphql:"error"`
+	Success           bool   `json:"success" graphql:"success"`
+	RateLimitExceeded bool   `json:"rate_limit_exceeded" graphql:"rate_limit_exceeded"`
+	ClientName        string `json:"client_name,omitempty" graphql:"client_name"`
+	RequestID         string `json:"request_id,omitempty" graphql:"request_id"`
+	MessageID         string `json:"message_id,omitempty" graphql:"message_id"`
+	Error             any    `json:"error,omitempty" graphql:"error"`
 }
 
 type SendNotificationOutput struct {
@@ -194,8 +194,8 @@ type Filter struct {
 }
 
 // NewTagFilter creates a tag filter
-func NewTagFilter(operator FilterOperator, key *string, value any) *Filter {
-	return &Filter{
+func NewTagFilter(operator FilterOperator, key *string, value any) Filter {
+	return Filter{
 		Type:     FilterTag,
 		Key:      key,
 		Value:    value,
@@ -204,31 +204,31 @@ func NewTagFilter(operator FilterOperator, key *string, value any) *Filter {
 }
 
 // NewTagFilterEqual creates a tag filter with equal operator
-func NewTagFilterEqual[V comparable](key string, value V) *Filter {
+func NewTagFilterEqual[V comparable](key string, value V) Filter {
 	return NewTagFilter(OperatorEqual, &key, value)
 }
 
 // NewTagFilterEqual creates a tag filter with not equal operator
-func NewTagFilterNotEqual[V comparable](key string, value V) *Filter {
+func NewTagFilterNotEqual[V comparable](key string, value V) Filter {
 	return NewTagFilter(OperatorNotEqual, &key, &value)
 }
 
 // NewTagFilterEqual creates a tag filter with least operator
-func NewTagFilterLeast[V comparable](key string, value V) *Filter {
+func NewTagFilterLeast[V comparable](key string, value V) Filter {
 	return NewTagFilter(OperatorLeast, &key, &value)
 }
 
 // NewTagFilterEqual creates a tag filter with greater operator
-func NewTagFilterGreater[V comparable](key string, value V) *Filter {
+func NewTagFilterGreater[V comparable](key string, value V) Filter {
 	return NewTagFilter(OperatorGreater, &key, &value)
 }
 
 // NewTagFilterExist creates a tag filter with exists operator
-func NewTagFilterExist(key string) *Filter {
+func NewTagFilterExist(key string) Filter {
 	return NewTagFilter(OperatorExist, &key, nil)
 }
 
 // NewTagFilterNotExist creates a tag filter with not_exists operator
-func NewTagFilterNotExist(key string) *Filter {
+func NewTagFilterNotExist(key string) Filter {
 	return NewTagFilter(OperatorNotExist, &key, nil)
 }
