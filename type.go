@@ -127,22 +127,23 @@ type NotificationMetadata struct {
 }
 
 type SendNotificationInput struct {
-	AppID        string                `json:"api_id,omitempty"`
-	ClientName   string                `json:"client_name,omitempty"`
-	TemplateID   string                `json:"template_id,omitempty"`
-	Broadcast    bool                  `json:"broadcast"`
-	Headings     map[string]string     `json:"headings,omitempty"`
-	Contents     map[string]string     `json:"contents,omitempty"`
-	ContentsHTML map[string]string     `json:"contents_html,omitempty"`
-	SubjectType  string                `json:"subject_type,omitempty"`
-	SubjectID    string                `json:"subject_id,omitempty"`
-	Topics       []string              `json:"topics,omitempty"`
-	UserIDs      []string              `json:"user_ids,omitempty"`
-	SendAfter    time.Time             `json:"send_after,omitempty"`
-	Data         map[string]string     `json:"data,omitempty"`
-	Metadata     *NotificationMetadata `json:"metadata,omitempty"`
-	Visible      bool                  `json:"visible,omitempty"`
-	Save         bool                  `json:"save,omitempty"`
+	AppID            string                `json:"api_id,omitempty"`
+	ClientName       string                `json:"client_name,omitempty"`
+	TemplateID       string                `json:"template_id,omitempty"`
+	Broadcast        bool                  `json:"broadcast"`
+	Headings         map[string]string     `json:"headings,omitempty"`
+	Contents         map[string]string     `json:"contents,omitempty"`
+	ContentsHTML     map[string]string     `json:"contents_html,omitempty"`
+	SubjectType      string                `json:"subject_type,omitempty"`
+	SubjectID        string                `json:"subject_id,omitempty"`
+	Topics           []string              `json:"topics,omitempty"`
+	UserIDs          []string              `json:"user_ids,omitempty"`
+	SendAfter        time.Time             `json:"send_after,omitempty"`
+	Data             map[string]string     `json:"data,omitempty"`
+	Metadata         *NotificationMetadata `json:"metadata,omitempty"`
+	Visible          bool                  `json:"visible,omitempty"`
+	Save             bool                  `json:"save,omitempty"`
+	AdditionalFields map[string]any        `json:"additional_fields,omitempty"`
 }
 
 type SendResponse struct {
