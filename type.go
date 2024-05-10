@@ -1,7 +1,6 @@
 package notification
 
 import (
-	"cmp"
 	"time"
 )
 
@@ -204,22 +203,22 @@ func NewTagFilter(operator FilterOperator, key *string, value any) *Filter {
 }
 
 // NewTagFilterEqual creates a tag filter with equal operator
-func NewTagFilterEqual[V cmp.Ordered](key string, value V) *Filter {
+func NewTagFilterEqual[V comparable](key string, value V) *Filter {
 	return NewTagFilter(OperatorEqual, &key, value)
 }
 
 // NewTagFilterEqual creates a tag filter with not equal operator
-func NewTagFilterNotEqual[V cmp.Ordered](key string, value V) *Filter {
+func NewTagFilterNotEqual[V comparable](key string, value V) *Filter {
 	return NewTagFilter(OperatorNotEqual, &key, &value)
 }
 
 // NewTagFilterEqual creates a tag filter with least operator
-func NewTagFilterLeast[V cmp.Ordered](key string, value V) *Filter {
+func NewTagFilterLeast[V comparable](key string, value V) *Filter {
 	return NewTagFilter(OperatorLeast, &key, &value)
 }
 
 // NewTagFilterEqual creates a tag filter with greater operator
-func NewTagFilterGreater[V cmp.Ordered](key string, value V) *Filter {
+func NewTagFilterGreater[V comparable](key string, value V) *Filter {
 	return NewTagFilter(OperatorGreater, &key, &value)
 }
 
