@@ -222,12 +222,12 @@ func NewTagFilterGreater[V comparable](key string, value V) *Filter {
 	return NewTagFilter(OperatorGreater, &key, &value)
 }
 
-// NewTagFilterEqual creates a tag filter with exists operator
-func NewTagFilterExists(key string) *Filter {
+// NewTagFilterExist creates a tag filter with exists operator
+func NewTagFilterExist(key string) *Filter {
 	return NewTagFilter(OperatorExist, &key, nil)
 }
 
-// NewTagFilterEqual creates a tag filter with not_exists operator
+// NewTagFilterNotExist creates a tag filter with not_exists operator
 func NewTagFilterNotExist(key string) *Filter {
 	return NewTagFilter(OperatorNotExist, &key, nil)
 }
