@@ -1,6 +1,7 @@
 package notification
 
 import (
+	"cmp"
 	"time"
 )
 
@@ -122,6 +123,8 @@ type NotificationMetadata struct {
 	SummaryArgCount *int32 `json:"summary_arg_count,omitempty"`
 	// Optional custom data from the template
 	Data map[string]string `json:"data,omitempty"`
+	// Additional filter operations
+	AdditionalFilters []Filter `json:"additional_filters,omitempty"`
 }
 
 type SendNotificationInput struct {
@@ -156,4 +159,76 @@ type SendNotificationOutput struct {
 	Responses    []*SendResponse `json:"responses" graphql:"responses"`
 	SuccessCount int             `json:"success_count" graphql:"success_count"`
 	FailureCount int             `json:"failure_count" graphql:"failure_count"`
+}
+
+// The type of the filter expression.
+type FilterType string
+
+const (
+	FilterTag FilterType = "tag"
+)
+
+// Operator of a filter expression.
+type FilterOperator string
+
+const (
+	OperatorEqual    FilterOperator = "="
+	OperatorNotEqual FilterOperator = "!="
+	OperatorLeast    FilterOperator = "<"
+	OperatorGreater  FilterOperator = ">"
+	OperatorExist    FilterOperator = "exists"
+	OperatorNotExist FilterOperator = "not_exists"
+)
+
+// Filter struct for Filter
+type Filter struct {
+	// The type of the filter expression.
+	Type FilterType `json:"type"`
+	// If `field` is `tag`, this field is *required* to specify `key` inside the tags.
+	Key *string `json:"key,omitempty"`
+	// Constant value to use as the second operand in the filter expression.
+	// This value is *required* when the relation operator is a binary operator.
+	Value any `json:"value,omitempty"`
+	// Operator of a filter expression.
+	Operator FilterOperator `json:"operator"`
+}
+
+// NewTagFilter creates a tag filter
+func NewTagFilter(operator FilterOperator, key *string, value any) *Filter {
+	return &Filter{
+		Type:     FilterTag,
+		Key:      key,
+		Value:    value,
+		Operator: operator,
+	}
+}
+
+// NewTagFilterEqual creates a tag filter with equal operator
+func NewTagFilterEqual[V cmp.Ordered](key string, value V) *Filter {
+	return NewTagFilter(OperatorEqual, &key, value)
+}
+
+// NewTagFilterEqual creates a tag filter with not equal operator
+func NewTagFilterNotEqual[V cmp.Ordered](key string, value V) *Filter {
+	return NewTagFilter(OperatorNotEqual, &key, &value)
+}
+
+// NewTagFilterEqual creates a tag filter with least operator
+func NewTagFilterLeast[V cmp.Ordered](key string, value V) *Filter {
+	return NewTagFilter(OperatorLeast, &key, &value)
+}
+
+// NewTagFilterEqual creates a tag filter with greater operator
+func NewTagFilterGreater[V cmp.Ordered](key string, value V) *Filter {
+	return NewTagFilter(OperatorGreater, &key, &value)
+}
+
+// NewTagFilterEqual creates a tag filter with exists operator
+func NewTagFilterExists(key string) *Filter {
+	return NewTagFilter(OperatorExist, &key, nil)
+}
+
+// NewTagFilterEqual creates a tag filter with not_exists operator
+func NewTagFilterNotExist(key string) *Filter {
+	return NewTagFilter(OperatorNotExist, &key, nil)
 }

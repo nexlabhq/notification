@@ -1,5 +1,4 @@
 //go:build integration
-// +build integration
 
 package notification
 
@@ -12,7 +11,7 @@ import (
 
 	"github.com/hasura/go-graphql-client"
 	"github.com/hgiasac/graphql-utils/client"
-	"github.com/stretchr/testify/assert"
+	"gotest.tools/v3/assert"
 )
 
 func cleanup(t *testing.T, client client.Client) {
@@ -28,7 +27,7 @@ func cleanup(t *testing.T, client client.Client) {
 	}
 
 	err := client.Mutate(context.Background(), &mutation, variables, graphql.OperationName("DeleteNotifications"))
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 }
 
 // hasuraTransport transport for Hasura GraphQL Client
@@ -87,7 +86,7 @@ func TestSendNotifications(t *testing.T) {
 			Save: true,
 		},
 	}, nil)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 
 	var getQuery struct {
 		Notifications []struct {
@@ -103,7 +102,7 @@ func TestSendNotifications(t *testing.T) {
 		},
 	}
 	err = client.client.Query(context.TODO(), &getQuery, getVariables)
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 	assert.Equal(t, 1, len(getQuery.Notifications))
 	assert.Equal(t, "default,test2", getQuery.Notifications[0].ClientName)
 }
@@ -133,10 +132,10 @@ func TestCancelNotifications(t *testing.T) {
 			},
 		},
 	}, nil)
-	assert.NoError(t, err)
-	assert.True(t, results.SuccessCount > 0)
+	assert.NilError(t, err)
+	assert.Check(t, results.SuccessCount > 0)
 
 	canceledCount, err := client.CancelNotificationsBySubject("test", "test_id")
-	assert.NoError(t, err)
+	assert.NilError(t, err)
 	assert.Equal(t, 1, canceledCount)
 }
