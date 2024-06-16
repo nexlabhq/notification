@@ -11,7 +11,6 @@ import (
 
 	"github.com/hasura/go-graphql-client"
 	"github.com/hgiasac/graphql-utils/client"
-	"gotest.tools/v3/assert"
 )
 
 func cleanup(t *testing.T, client client.Client) {
@@ -27,7 +26,9 @@ func cleanup(t *testing.T, client client.Client) {
 	}
 
 	err := client.Mutate(context.Background(), &mutation, variables, graphql.OperationName("DeleteNotifications"))
-	assert.NilError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 }
 
 // hasuraTransport transport for Hasura GraphQL Client
@@ -86,7 +87,9 @@ func TestSendNotifications(t *testing.T) {
 			Save: true,
 		},
 	}, nil)
-	assert.NilError(t, err)
+	if err != nil {
+		t.Fatal(err)
+	}
 
 	var getQuery struct {
 		Notifications []struct {
@@ -102,9 +105,16 @@ func TestSendNotifications(t *testing.T) {
 		},
 	}
 	err = client.client.Query(context.TODO(), &getQuery, getVariables)
-	assert.NilError(t, err)
-	assert.Equal(t, 1, len(getQuery.Notifications))
-	assert.Equal(t, "default,test2", getQuery.Notifications[0].ClientName)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(getQuery.Notifications) != 1 {
+		t.Fatalf("expected 1 item, got: %d", len(getQuery.Notifications))
+	}
+	clientName := "default,test2"
+	if getQuery.Notifications[0].ClientName != clientName {
+		t.Fatalf("expected %s, got: %s", clientName, getQuery.Notifications[0].ClientName)
+	}
 }
 
 func TestCancelNotifications(t *testing.T) {
@@ -132,10 +142,18 @@ func TestCancelNotifications(t *testing.T) {
 			},
 		},
 	}, nil)
-	assert.NilError(t, err)
-	assert.Check(t, results.SuccessCount > 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if results.SuccessCount == 0 {
+		t.Fatal("success count must be larger than 0")
+	}
 
 	canceledCount, err := client.CancelNotificationsBySubject("test", "test_id")
-	assert.NilError(t, err)
-	assert.Equal(t, 1, canceledCount)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if canceledCount != 1 {
+		t.Fatal("expected 1 cancel, got: %d", canceledCount)
+	}
 }
